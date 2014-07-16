@@ -1,10 +1,10 @@
 Query =
   query:false
-  options:{}
-  conditions:{}
 
   # init
   init:(@query)->
+    @options = {}
+    @conditions = {}
     @order()
     @limit()
     @opt()
