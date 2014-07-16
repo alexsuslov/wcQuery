@@ -1,4 +1,4 @@
-# Resp.query -> mongo find options
+# Resp.query -> Mongoose model find options
 
 ## Filter
 - /api/item?name=test

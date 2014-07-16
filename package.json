@@ -1,18 +1,20 @@
 {
-  "name": "wcQuery",
-  "version": "0.0.0",
-  "description": "convert req.query to mongo find options",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [
-    "angular-fullstack",
-    "server",
-    "api",
-    "mongo",
-    "query"
-  ],
-  "author": "Alex Suslov <suslov@me.com>",
-  "license": "MIT"
+    "name": "wc-query",
+    "version": "0.0.1",
+    "description": "convert req.query to mongo find options",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/alexsuslov/wcQuery.git"
+    },
+    "keywords": [
+        "angular-fullstack",
+        "api"
+    ],
+    "author": "Alex Suslov",
+    "email": "suslov@me.com",
+    "license": "MIT"
 }
