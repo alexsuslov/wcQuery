@@ -3,10 +3,10 @@ var Query;
 
 Query = {
   query: false,
-  options: {},
-  conditions: {},
   init: function(query) {
     this.query = query;
+    this.options = {};
+    this.conditions = {};
     this.order();
     this.limit();
     this.opt();
