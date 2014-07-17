@@ -35,8 +35,8 @@ Query =
     return $ne: tr if str[0] is '!'
     # ~regex
     return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
-    # text
-    return $text:$search:tr if str[0] is '$'
+    # # text
+    # return $text:$search:tr if str[0] is '$'
     str
 
   ###
