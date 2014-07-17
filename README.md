@@ -1,5 +1,26 @@
 # Resp.query -> Mongoose model find options
 
+## Simple use in server api controller:
+
+```
+"use strict"
+
+_ = require("lodash")
+Item = require("./item.model")
+Query = require("wc-query")
+fields = {}
+
+# Get list of items
+exports.index = (req, res) ->
+  query = Query(req.query)
+  Item.find query.conditions, fields, query.options, (err, items) ->
+    throw err if err
+    return handleError(res, err)  if err
+    res.json 200, items
+```
+
+
+
 ## Comparison Query Operators
 
 ### EQ
@@ -19,11 +40,11 @@
     + name: $gte: 1
 
 ### LT
-- url: /api/item?name=>1
+- url: /api/item?name=<1
     + name: $lt: 1
 
 ### LTE
-- url: /api/item?name=]1
+- url: /api/item?name=[1
     + name: $lte: 1
 
 ### IN 
