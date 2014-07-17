@@ -7,6 +7,9 @@
     + conditions:{$ne:name:'test'}
 - /api/item?name=~test
     + conditions:{name:$regex:'test'}
+---|---|---
+Char | Query Operator | Uri | Conditions
+! | equal| /api/item?name=test | conditions:{name:'test'}
 
 ## Sort
 

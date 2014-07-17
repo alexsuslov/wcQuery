@@ -19,10 +19,24 @@ Query =
   # @return Object condition value
   parse:(str)->
     tr = @_str str
+    # in
+    return $in: tr.split '|' if str[0] is '@'
+    # nin
+    return $nin: tr.split '|' if str[0] is '#'
+    # gt
+    return $gt: tr if str[0] is '>'
+    # gte
+    return $gte: tr if str[0] is ']'
+    # lt
+    return $lt: tr if str[0] is '<'
+    # lte
+    return $lte: tr if str[0] is '['
     # not eq
     return $ne: tr if str[0] is '!'
     # ~regex
     return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
+    # text
+    return $text:$search:tr if str[0] is '$'
     str
 
   ###
