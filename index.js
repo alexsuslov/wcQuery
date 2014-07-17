@@ -58,13 +58,6 @@ Query = {
         $options: 'i'
       };
     }
-    if (str[0] === '$') {
-      return {
-        $text: {
-          $search: tr
-        }
-      };
-    }
     return str;
   },
 
