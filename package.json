@@ -1,6 +1,6 @@
 {
     "name": "wc-query",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "description": "convert req.query to mongo find options",
     "main": "index.js",
     "scripts": {
@@ -18,10 +18,10 @@
     "email": "suslov@me.com",
     "license": "MIT",
     "devDependencies": {
-        "grunt-contrib-coffee": "~0.9.0",
-        "grunt-coffeelint": "0.0.8",
-        "grunt-contrib-watch": "~0.5.3",
-        "load-grunt-tasks": "~0.3.0",
-        "grunt": "~0.4.2"
+        "grunt": "^0.4.5",
+        "grunt-coffeelint": "0.0.10",
+        "grunt-contrib-coffee": "^0.10.1",
+        "grunt-contrib-watch": "^0.6.1",
+        "load-grunt-tasks": "^0.6.0"
     }
 }
