@@ -1,4 +1,4 @@
-# Resp.query -> Mongoose model find options
+# Express req.query -> Mongoose model find options
 
 ## Simple use in server api controller:
 

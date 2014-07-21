@@ -1,25 +1,47 @@
-
+'use strict'
+###
+Express req.query -> Mongoose model find options
+@author Alex Suslov <suslov@me.com>
+@copyright MIT
+@version 0.0.8
+###
 Query =
   query:false
 
-  # init
-  init:(@query)->
+  ###
+  main
+  @param query[String] string from EXPRESS req
+  @return Object
+    conditions: mongo filter object
+    options: mongo find options
+  ###
+  main:(@query)->
     @options = {}
     @conditions = {}
-    @order()
-    # @or()
+
     for name in ['or','and']
       @logical(name)
-    @limit()
-    @opt()
-    @
 
+    @order().limit().opt()
+
+    r =
+      conditions: @conditions
+      options: @options
+    # @
+
+  ###
+  @param value[String] 'name=test'
+  @return Object {name:'test'}
+  ###
   expression:(value)->
     data = value.split '='
     ret = {}
     ret[data[0]] = @parse data[1]
     ret
 
+  #create logical function
+  # @param name[String] function name ['or','and']
+  # @return Object
   logical:(name)->
     if @query[name]
       Arr = @query[name].split ','
@@ -28,14 +50,21 @@ Query =
           @expression value)
 
       delete @query[name]
+    @
 
-  #Clean regexp simbols
+  ###
+  Clean regexp simbols
+  @param str[String] string to clean
+  @return [String] cleaning string
+  ###
   escapeRegExp: (str)->
     str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
 
-  # Parse ~, !
-  # @param str[String]  '!name'
-  # @return Object condition value
+  ###
+  Parse ~, !, ....
+  @param str[String]  '!name'
+  @return Object condition value
+  ###
   parse:(str)->
     tr = @_str str
     # in
@@ -65,9 +94,6 @@ Query =
   ###
   _str:(str)->
     str.substr( 1 , str.length)
-  isString:  (obj)->
-    toString.call(obj) == '[object String]'
-
 
   ###
   Create options from query
@@ -115,4 +141,6 @@ Query =
 
 
 module.exports = (query)->
-  Query.init query
+  Query.main query
+
+

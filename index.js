@@ -1,22 +1,44 @@
+'use strict';
+
+/*
+Express req.query -> Mongoose model find options
+@author Alex Suslov <suslov@me.com>
+@copyright MIT
+@version 0.0.8
+ */
 var Query;
 
 Query = {
   query: false,
-  init: function(query) {
-    var name, _i, _len, _ref;
+
+  /*
+  main
+  @param query[String] string from EXPRESS req
+  @return Object
+    conditions: mongo filter object
+    options: mongo find options
+   */
+  main: function(query) {
+    var name, r, _i, _len, _ref;
     this.query = query;
     this.options = {};
     this.conditions = {};
-    this.order();
     _ref = ['or', 'and'];
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       name = _ref[_i];
       this.logical(name);
     }
-    this.limit();
-    this.opt();
-    return this;
+    this.order().limit().opt();
+    return r = {
+      conditions: this.conditions,
+      options: this.options
+    };
   },
+
+  /*
+  @param value[String] 'name=test'
+  @return Object {name:'test'}
+   */
   expression: function(value) {
     var data, ret;
     data = value.split('=');
@@ -39,12 +61,25 @@ Query = {
           return _results;
         }).call(this);
       }
-      return delete this.query[name];
+      delete this.query[name];
     }
+    return this;
   },
+
+  /*
+  Clean regexp simbols
+  @param str[String] string to clean
+  @return [String] cleaning string
+   */
   escapeRegExp: function(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   },
+
+  /*
+  Parse ~, !, ....
+  @param str[String]  '!name'
+  @return Object condition value
+   */
   parse: function(str) {
     var tr;
     tr = this._str(str);
@@ -99,9 +134,6 @@ Query = {
    */
   _str: function(str) {
     return str.substr(1, str.length);
-  },
-  isString: function(obj) {
-    return toString.call(obj) === '[object String]';
   },
 
   /*
@@ -160,5 +192,5 @@ Query = {
 };
 
 module.exports = function(query) {
-  return Query.init(query);
+  return Query.main(query);
 };
