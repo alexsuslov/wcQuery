@@ -1,3 +1,4 @@
+
 Query =
   query:false
 
@@ -6,9 +7,27 @@ Query =
     @options = {}
     @conditions = {}
     @order()
+    # @or()
+    for name in ['or','and']
+      @logical(name)
     @limit()
     @opt()
     @
+
+  expression:(value)->
+    data = value.split '='
+    ret = {}
+    ret[data[0]] = @parse data[1]
+    ret
+
+  logical:(name)->
+    if @query[name]
+      Arr = @query[name].split ','
+      if Arr.length
+        @conditions['$' + name] = (for value in Arr
+          @expression value)
+
+      delete @query[name]
 
   #Clean regexp simbols
   escapeRegExp: (str)->
@@ -46,6 +65,8 @@ Query =
   ###
   _str:(str)->
     str.substr( 1 , str.length)
+  isString:  (obj)->
+    toString.call(obj) == '[object String]'
 
 
   ###
