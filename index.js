@@ -3,13 +3,44 @@ var Query;
 Query = {
   query: false,
   init: function(query) {
+    var name, _i, _len, _ref;
     this.query = query;
     this.options = {};
     this.conditions = {};
     this.order();
+    _ref = ['or', 'and'];
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      name = _ref[_i];
+      this.logical(name);
+    }
     this.limit();
     this.opt();
     return this;
+  },
+  expression: function(value) {
+    var data, ret;
+    data = value.split('=');
+    ret = {};
+    ret[data[0]] = this.parse(data[1]);
+    return ret;
+  },
+  logical: function(name) {
+    var Arr, value;
+    if (this.query[name]) {
+      Arr = this.query[name].split(',');
+      if (Arr.length) {
+        this.conditions['$' + name] = (function() {
+          var _i, _len, _results;
+          _results = [];
+          for (_i = 0, _len = Arr.length; _i < _len; _i++) {
+            value = Arr[_i];
+            _results.push(this.expression(value));
+          }
+          return _results;
+        }).call(this);
+      }
+      return delete this.query[name];
+    }
   },
   escapeRegExp: function(str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -68,6 +99,9 @@ Query = {
    */
   _str: function(str) {
     return str.substr(1, str.length);
+  },
+  isString: function(obj) {
+    return toString.call(obj) === '[object String]';
   },
 
   /*

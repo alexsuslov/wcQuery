@@ -19,6 +19,14 @@ exports.index = (req, res) ->
     res.json 200, items
 ```
 
+## Logical Query Operators
+### OR 
+- /?or='name=3,test=!4'
+    + { '$or': [ { name: '3' }, { test: $ne :4 } ] }
+
+### AND 
+- /?and='name=3,test=!4'
+    + { '$and': [ { name: '3' }, { test: $ne :4 } ] }
 
 
 ## Comparison Query Operators

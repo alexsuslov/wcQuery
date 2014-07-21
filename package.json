@@ -1,17 +1,20 @@
 {
     "name": "wc-query",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "description": "convert req.query to mongo find options",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "mocha --compilers coffee:coffee-script/register"
     },
     "repository": {
         "type": "git",
         "url": "https://github.com/alexsuslov/wcQuery.git"
     },
     "keywords": [
-        "angular-fullstack",
+        "express",
+        "generator-angular-fullstack",
+        "rest",
+        "mongodb",
         "api"
     ],
     "author": "Alex Suslov",

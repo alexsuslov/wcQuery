@@ -20,7 +20,7 @@ describe "Query", ->
   # $AND
   # /?or='name=3,test=4'
 
-  describe "#AND /?and='name=3,test=4", ->
+  describe "#AND /?and='name=3,test=!4", ->
     it "should return { '$and': [ { name: '3' }, { test: [Object] } ] }", ->
       opt = query "and":'name=3,test=!4'
       # console.log opt
