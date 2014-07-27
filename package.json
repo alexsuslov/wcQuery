@@ -1,6 +1,6 @@
 {
     "name": "wc-query",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "description": "convert req.query to mongo find options",
     "main": "index.js",
     "scripts": {
@@ -26,5 +26,8 @@
         "grunt-contrib-coffee": "^0.10.1",
         "grunt-contrib-watch": "^0.6.1",
         "load-grunt-tasks": "^0.6.0"
+    },
+    "dependencies": {
+        "mongoose": "^3.8.14"
     }
 }

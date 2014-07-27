@@ -1,6 +1,5 @@
 query = require("../coffee/index")
 assert = require("assert")
-
 describe "Query", ->
   ###
   #
@@ -80,6 +79,12 @@ describe "Query", ->
       assert.equal  'test', opt.conditions.name
       assert.equal 25, opt.options.limit
       assert.equal 0, opt.options.skip
+
+  describe "#ObjectId name=_test", ->
+    it "should return conditions: name:'test' ", ->
+      opt = query id:"_53c699da9189110000454007"
+      assert.equal '53c699da9189110000454007', opt.conditions.id.path
+
 
   describe "#NEQ name=!test", ->
     it "should return { conditions: 'name:$ne:test'", ->

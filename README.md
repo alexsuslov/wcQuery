@@ -1,4 +1,9 @@
 # Express req.query -> Mongoose model find options
+## New in 0.0.9
+### ObjectId
+- url: /api/item?name=_53c699da9189110000454007
+    + name: ObjectId(53c699da9189110000454007)
+
 
 ## Simple use in server api controller:
 
@@ -34,6 +39,10 @@ exports.index = (req, res) ->
 ### EQ
 - url: /api/item?name=test
     + name: 'test'
+
+### ObjectId
+- url: /api/item?name=_53c699da9189110000454007
+    + name: ObjectId(53c699da9189110000454007)
 
 ### NEQ
 - url: /api/item?name=!test

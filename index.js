@@ -1,4 +1,12 @@
 'use strict';
+var ObjectId, Query, Schema, mongoose;
+
+mongoose = require('mongoose');
+
+Schema = mongoose.Schema;
+
+ObjectId = Schema.Types.ObjectId;
+
 
 /*
 Express req.query -> Mongoose model find options
@@ -6,7 +14,6 @@ Express req.query -> Mongoose model find options
 @copyright MIT
 @version 0.0.8
  */
-var Query;
 
 Query = {
   query: false,
@@ -123,6 +130,9 @@ Query = {
         $regex: this.escapeRegExp(tr),
         $options: 'i'
       };
+    }
+    if (str[0] === '_') {
+      return ObjectId(tr);
     }
     return str;
   },

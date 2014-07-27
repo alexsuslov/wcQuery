@@ -1,4 +1,7 @@
 'use strict'
+mongoose = require('mongoose')
+Schema = mongoose.Schema
+ObjectId = Schema.Types.ObjectId
 ###
 Express req.query -> Mongoose model find options
 @author Alex Suslov <suslov@me.com>
@@ -85,6 +88,8 @@ Query =
     return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
     # # text
     # return $text:$search:tr if str[0] is '$'
+    # ObjectId
+    return new ObjectId(tr) if str[0] is '_'
     str
 
   ###
