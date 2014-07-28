@@ -1,14 +1,23 @@
 query = require("../coffee/index")
 assert = require("assert")
-describe "Query", ->
-  ###
-  #
-  #  Logical Query Operators >
-  #
-  ###
-  # $OR
-  # /?or='name=3,test=4'
 
+mongoose = require('mongoose')
+Schema = mongoose.Schema
+ObjectId = Schema.Types.ObjectId
+
+model = mongoose.model 'test', new Schema
+  str: String
+  num: Number
+  dat: Date
+  bl: Boolean
+  ar: Array
+  obId: ObjectId
+  t:
+    id:Number
+
+
+
+describe "Query", ->
   describe "#OR /?or='name=3,test=4", ->
     it "should return { '$or': [ { name: '3' }, { test: [Object] } ] }", ->
       opt = query "or":'name=3,test=!4'
@@ -130,3 +139,10 @@ describe "Query", ->
       assert.equal 1, opt.conditions.name['$nin'][0]
       assert.equal 2, opt.conditions.name['$nin'][1]
       assert.equal 3, opt.conditions.name['$nin'][2]
+
+describe "Model", ->
+  it "return type", ->
+    query.Query.model = model
+    assert.equal 'String', query.Query.detectType 'str'
+    assert.equal 'Number', query.Query.detectType 'num'
+    assert.equal 'Number', query.Query.detectType 't.id'

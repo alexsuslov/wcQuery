@@ -14,25 +14,34 @@ module.exports = (grunt)->
             'coffee/*.coffee'
             '!coffee/99*.coffee'
           ]
+    mochaTest:
+      test:
+        options:
+          reporter: 'spec'
+          require: 'coffee-script/register'
+        src:['test/**/*.coffee']
     watch:
       config:
         files: ['Gruntfile.coffee']
         tasks: ['coffeelint']
       tests:
         files: ['test/*.coffee']
-        tasks: ['coffeelint']
+        tasks: ['coffeelint', 'mochaTest']
       app:
         files: ['coffee/*.coffee']
         tasks: [
           'coffeelint'
+          'mochaTest'
           'coffee'
         ]
   grunt.registerTask('default', [
     'coffeelint'
+    'mochaTest'
     'coffee'
     ])
   grunt.registerTask('develop', [
     'coffeelint'
+    'mochaTest'
     'coffee'
     'watch'
     ])

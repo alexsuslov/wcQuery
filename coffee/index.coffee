@@ -6,7 +6,6 @@ ObjectId = Schema.Types.ObjectId
 Express req.query -> Mongoose model find options
 @author Alex Suslov <suslov@me.com>
 @copyright MIT
-@version 0.0.8
 ###
 Query =
   query:false
@@ -55,6 +54,14 @@ Query =
       delete @query[name]
     @
 
+  parseVal:(val)->
+    return parseFloat val   if @type is 'Number'
+    return !!val            if @type is 'Boolean'
+    return new ObjectId val if @type is 'ObjectID'
+    return new Date val     if @type is 'Date'
+    val
+
+
   ###
   Clean regexp simbols
   @param str[String] string to clean
@@ -75,22 +82,24 @@ Query =
     # nin
     return $nin: tr.split '|' if str[0] is '#'
     # gt
-    return $gt: tr if str[0] is '>'
+    return $gt: @parseVal tr if str[0] is '>'
     # gte
-    return $gte: tr if str[0] is ']'
+    return $gte: @parseVal tr if str[0] is ']'
     # lt
-    return $lt: tr if str[0] is '<'
+    return $lt: @parseVal tr if str[0] is '<'
     # lte
-    return $lte: tr if str[0] is '['
+    return $lte: @parseVal tr if str[0] is '['
     # not eq
-    return $ne: tr if str[0] is '!'
+    return $ne: @parseVal tr if str[0] is '!'
     # ~regex
     return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
     # # text
     # return $text:$search:tr if str[0] is '$'
     # ObjectId
     return new ObjectId(tr) if str[0] is '_'
-    str
+    @parseVal str
+
+
 
   ###
   Cut first char from string
@@ -107,8 +116,30 @@ Query =
     if @query
       for name of @query
         @query[name] = decodeURI @query[name]
+        # detect type
+        @type = @detectType name
+
         @conditions[name] = @parse @query[name] if @query[name]
     @
+
+  detectType: (name)->
+    if @model and @model.schema.path(name)
+      # Date Boolean Array
+      if @model.schema.path(name).instance is 'undefined'
+        if model.schema.path(name).options?.type
+
+          if model.schema.path(name).options.type.name is Date
+            return 'Date'
+
+          if model.schema.path(name).options.type.name is Boolean
+            return 'Boolean'
+
+          if model.schema.path(name).options.type.name is Array
+            return 'Array'
+
+      # Number String ObjectID
+      return @model.schema.path(name).instance if @model
+    'String'
 
 
   ###
@@ -149,3 +180,4 @@ module.exports = (query)->
   Query.main query
 
 
+module.exports.Query = Query

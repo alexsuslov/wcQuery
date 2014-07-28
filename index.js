@@ -12,7 +12,6 @@ ObjectId = Schema.Types.ObjectId;
 Express req.query -> Mongoose model find options
 @author Alex Suslov <suslov@me.com>
 @copyright MIT
-@version 0.0.8
  */
 
 Query = {
@@ -72,6 +71,21 @@ Query = {
     }
     return this;
   },
+  parseVal: function(val) {
+    if (this.type === 'Number') {
+      return parseFloat(val);
+    }
+    if (this.type === 'Boolean') {
+      return !!val;
+    }
+    if (this.type === 'ObjectID') {
+      return new ObjectId(val);
+    }
+    if (this.type === 'Date') {
+      return new Date(val);
+    }
+    return val;
+  },
 
   /*
   Clean regexp simbols
@@ -102,27 +116,27 @@ Query = {
     }
     if (str[0] === '>') {
       return {
-        $gt: tr
+        $gt: this.parseVal(tr)
       };
     }
     if (str[0] === ']') {
       return {
-        $gte: tr
+        $gte: this.parseVal(tr)
       };
     }
     if (str[0] === '<') {
       return {
-        $lt: tr
+        $lt: this.parseVal(tr)
       };
     }
     if (str[0] === '[') {
       return {
-        $lte: tr
+        $lte: this.parseVal(tr)
       };
     }
     if (str[0] === '!') {
       return {
-        $ne: tr
+        $ne: this.parseVal(tr)
       };
     }
     if (str[0] === '~') {
@@ -132,9 +146,9 @@ Query = {
       };
     }
     if (str[0] === '_') {
-      return ObjectId(tr);
+      return new ObjectId(tr);
     }
-    return str;
+    return this.parseVal(str);
   },
 
   /*
@@ -154,12 +168,35 @@ Query = {
     if (this.query) {
       for (name in this.query) {
         this.query[name] = decodeURI(this.query[name]);
+        this.type = this.detectType(name);
         if (this.query[name]) {
           this.conditions[name] = this.parse(this.query[name]);
         }
       }
     }
     return this;
+  },
+  detectType: function(name) {
+    var _ref;
+    if (this.model && this.model.schema.path(name)) {
+      if (this.model.schema.path(name).instance === 'undefined') {
+        if ((_ref = model.schema.path(name).options) != null ? _ref.type : void 0) {
+          if (model.schema.path(name).options.type.name === Date) {
+            return 'Date';
+          }
+          if (model.schema.path(name).options.type.name === Boolean) {
+            return 'Boolean';
+          }
+          if (model.schema.path(name).options.type.name === Array) {
+            return 'Array';
+          }
+        }
+      }
+      if (this.model) {
+        return this.model.schema.path(name).instance;
+      }
+    }
+    return 'String';
   },
 
   /*
@@ -204,3 +241,5 @@ Query = {
 module.exports = function(query) {
   return Query.main(query);
 };
+
+module.exports.Query = Query;
