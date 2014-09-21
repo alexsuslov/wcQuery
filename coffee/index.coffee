@@ -26,9 +26,10 @@ Query =
 
     @order().limit().opt()
 
-    r =
+    {
       conditions: @conditions
       options: @options
+    }
     # @
 
   ###
@@ -77,6 +78,8 @@ Query =
   ###
   parse:(str)->
     tr = @_str str
+    # mod
+    return $mod: tr.split '|' if str[0] is '%'
     # in
     return $in: tr.split '|' if str[0] is '@'
     # nin
