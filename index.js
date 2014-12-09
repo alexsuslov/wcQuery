@@ -25,7 +25,7 @@ Query = {
     options: mongo find options
    */
   main: function(query) {
-    var name, r, _i, _len, _ref;
+    var name, _i, _len, _ref;
     this.query = query;
     this.options = {};
     this.conditions = {};
@@ -35,7 +35,7 @@ Query = {
       this.logical(name);
     }
     this.order().limit().opt();
-    return r = {
+    return {
       conditions: this.conditions,
       options: this.options
     };
@@ -104,6 +104,11 @@ Query = {
   parse: function(str) {
     var tr;
     tr = this._str(str);
+    if (str[0] === '%') {
+      return {
+        $mod: tr.split('|')
+      };
+    }
     if (str[0] === '@') {
       return {
         $in: tr.split('|')
@@ -137,6 +142,16 @@ Query = {
     if (str[0] === '!') {
       return {
         $ne: this.parseVal(tr)
+      };
+    }
+    if (str === '+') {
+      return {
+        $exists: true
+      };
+    }
+    if (str === '-') {
+      return {
+        $exists: false
       };
     }
     if (str[0] === '~') {

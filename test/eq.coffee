@@ -18,6 +18,18 @@ model = mongoose.model 'test', new Schema
 
 
 describe "Query", ->
+  describe "#OR /?name=+", ->
+    it "should return { name: { '$exists': true } }",->
+      opt = query name:'+'
+      assert.equal  true, opt.conditions.name['$exists']
+
+  describe "#OR /?name=-", ->
+    it "should return { name: { '$exists': false } }",->
+      opt = query name:'-'
+      assert.equal  false, opt.conditions.name['$exists']
+
+
+
   describe "#OR /?or='name=3,test=4", ->
     it "should return { '$or': [ { name: '3' }, { test: [Object] } ] }", ->
       opt = query "or":'name=3,test=!4'

@@ -40,6 +40,14 @@ exports.index = (req, res) ->
 - url: /api/item?name=test
     + name: 'test'
 
+### Exists
+
+- url: /api/item?name=+
+    + name: $exists: true
+
+- url: /api/item?name=-
+    + name: $exists: false
+
 ### ObjectId
 - url: /api/item?name=_53c699da9189110000454007
     + name: ObjectId(53c699da9189110000454007)

@@ -94,6 +94,9 @@ Query =
     return $lte: @parseVal tr if str[0] is '['
     # not eq
     return $ne: @parseVal tr if str[0] is '!'
+    # Exists
+    return "$exists": true if str is '+'
+    return "$exists": false if str is '-'
     # ~regex
     return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
     # # text
