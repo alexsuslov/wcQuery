@@ -1,4 +1,25 @@
 # Express req.query -> Mongoose model find options
+## New in 0.0.14
+Rewrite from scratch
+
+### Depricated:
+- ObjectId
+
+### Add new command:
+```
+Query.on '_', (name, value)->
+
+```
+function must return object for mongo
+
+### Remove  command:
+```
+Query.off '_'
+
+```
+
+
+
 ## New in 0.0.10
 ### ObjectId
 - url: /api/item?name=_53c699da9189110000454007

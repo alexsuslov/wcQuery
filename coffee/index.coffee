@@ -1,189 +1,109 @@
+###*
+ * Express Query to Mongoose model find
+###
 'use strict'
-mongoose = require('mongoose')
-Schema = mongoose.Schema
-ObjectId = Schema.Types.ObjectId
-###
-Express req.query -> Mongoose model find options
-@author Alex Suslov <suslov@me.com>
-@copyright MIT
-###
+
+extend = (source, obj)->
+  for name of obj
+    source[name] = obj[name]
+
+
+ret = (name, val)->
+  r = {}
+  r[name] = val
+  r
+
+
 Query =
-  query:false
+  # reserved words
+  words:
+    order:(value)-> sort:(
+      if value[0] is '-'
+        name = value.substr( 1 , value.length)
+        ret name, -1
+      else
+        ret value, 1
+      )
 
-  ###
-  main
-  @param query[String] string from EXPRESS req
-  @return Object
-    conditions: mongo filter object
-    options: mongo find options
-  ###
+    limit:(value)-> ret 'limit', parseInt value
+    skip :(value)-> ret 'skip', parseInt value
+
+  # Events
+  vents:
+    escapeRegExp: (str)->
+      str.replace /[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"
+
+    '~':(name, value)->
+      ret name, {$regex: @escapeRegExp(value), $options  : 'i'}
+    '#':(name, value)-> ret name, $nin: value.split '|'
+    '@':(name, value)-> ret name, $in: value.split '|'
+    '[':(name, value)-> ret name, $lte: value
+    '<':(name, value)-> ret name, $lt: value
+    ']':(name, value)-> ret name, $gte: value
+    '>':(name, value)-> ret name, $gt: value
+    '!':(name, value)-> ret name, $ne: value
+    '+':(name, value)-> ret name, $exists: true
+    '-':(name, value)-> ret name, $exists: false
+    default:(name, value)->ret name, value
+
+
+  vent: (vent, name, value)->
+    @vents[vent](name, value) if @vents[vent]
+
+  on:(name, fn)->
+    @vents[name] = fn
+    @
+
+  off:(name)->
+    vents[name] = undefined
+    @
+
+  logic:(name, value)->
+    arr = value.split( ',' )
+    query = []
+    for value in arr
+      d = value.split '='
+      query.push @parse ret([d[0]],  d[1])
+
+    ret '$' + name, query
+
   main:(@query)->
-    @options = {}
-    @conditions = {}
+    conditions = {}
+    options = {}
+    if @query
+      # logic
+      for name in ['or','and']
+        extend conditions, @logic( name, @query[name]) if @query[name]
+        delete @query[name]
 
-    for name in ['or','and']
-      @logical(name)
+      # words
+      for name of @query
+        if @words[name]
+          # console.log   @words[name] @query[name]
+          extend options, @words[name](@query[name])
+          delete @query[name]
 
-    @order().limit().opt()
+      extend conditions, @parse( @query )
 
     {
-      conditions: @conditions
-      options: @options
+      conditions: conditions
+      options:  options
     }
-    # @
-
-  ###
-  @param value[String] 'name=test'
-  @return Object {name:'test'}
-  ###
-  expression:(value)->
-    data = value.split '='
-    ret = {}
-    ret[data[0]] = @parse data[1]
-    ret
-
-  #create logical function
-  # @param name[String] function name ['or','and']
-  # @return Object
-  logical:(name)->
-    if @query[name]
-      Arr = @query[name].split ','
-      if Arr.length
-        @conditions['$' + name] = (for value in Arr
-          @expression value)
-
-      delete @query[name]
-    @
-
-  parseVal:(val)->
-    return parseFloat val   if @type is 'Number'
-    return !!val            if @type is 'Boolean'
-    return new ObjectId val if @type is 'ObjectID'
-    return new Date val     if @type is 'Date'
-    val
 
 
-  ###
-  Clean regexp simbols
-  @param str[String] string to clean
-  @return [String] cleaning string
-  ###
-  escapeRegExp: (str)->
-    str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&")
-
-  ###
-  Parse ~, !, ....
-  @param str[String]  '!name'
-  @return Object condition value
-  ###
-  parse:(str)->
-    tr = @_str str
-    # mod
-    return $mod: tr.split '|' if str[0] is '%'
-    # in
-    return $in: tr.split '|' if str[0] is '@'
-    # nin
-    return $nin: tr.split '|' if str[0] is '#'
-    # gt
-    return $gt: @parseVal tr if str[0] is '>'
-    # gte
-    return $gte: @parseVal tr if str[0] is ']'
-    # lt
-    return $lt: @parseVal tr if str[0] is '<'
-    # lte
-    return $lte: @parseVal tr if str[0] is '['
-    # not eq
-    return $ne: @parseVal tr if str[0] is '!'
-    # Exists
-    return "$exists": true if str is '+'
-    return "$exists": false if str is '-'
-    # ~regex
-    return $regex:@escapeRegExp( tr), $options:'i' if str[0] is '~'
-    # # text
-    # return $text:$search:tr if str[0] is '$'
-    # ObjectId
-    return new ObjectId(tr) if str[0] is '_'
-    @parseVal str
-
-
-
-  ###
-  Cut first char from string
-  @param str[String]  '!test'
-  @return String 'test'
-  ###
-  _str:(str)->
-    str.substr( 1 , str.length)
-
-  ###
-  Create options from query
-  ###
-  opt:->
+  parse:(@query)->
+    condition = {}
     if @query
       for name of @query
-        @query[name] = decodeURI @query[name]
-        # detect type
-        @type = @detectType name
-
-        @conditions[name] = @parse @query[name] if @query[name]
-    @
-
-  detectType: (name)->
-    if @model and @model.schema.path(name)
-      # Date Boolean Array
-      if @model.schema.path(name).instance is 'undefined'
-        if model.schema.path(name).options?.type
-
-          if model.schema.path(name).options.type.name is Date
-            return 'Date'
-
-          if model.schema.path(name).options.type.name is Boolean
-            return 'Boolean'
-
-          if model.schema.path(name).options.type.name is Array
-            return 'Array'
-
-      # Number String ObjectID
-      return @model.schema.path(name).instance if @model
-    'String'
-
-
-  ###
-  Create sort from query
-  ###
-  order:->
-    if @query.order
-      @options.sort ?= {}
-      if @query.order[0] is '-'
-        @options.sort[@_str(@query.order)] = -1
-      else
-        @options.sort[@query.order] = 1
-
-      delete @query.order
-    @
-
-
-  ###
-  Create limit from query
-  ###
-  limit:->
-    # limit
-    if @query.limit
-      @options.limit = parseInt @query.limit
-      delete @query.limit
-    else
-      @options.limit = 25
-    # skip
-    if @query.skip
-      @options.skip = parseInt @query.skip
-      delete @query.skip
-    else
-      @options.skip = 0
-    @
-
+        value = decodeURI @query[name]
+        vent = value[0]
+        if @vents[vent]
+          extend condition, @vent(vent, name, value.substr( 1 , value.length))
+        else
+          extend condition, @vent('default' , name, value)
+    condition
 
 module.exports = (query)->
   Query.main query
 
 
-module.exports.Query = Query

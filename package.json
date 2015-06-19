@@ -1,34 +1,35 @@
 {
-    "name": "wc-query",
-    "version": "0.0.13",
-    "description": "convert req.query to mongo find options",
-    "main": "index.js",
-    "scripts": {
-        "test": "mocha --compilers coffee:coffee-script/register"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/alexsuslov/wcQuery.git"
-    },
-    "keywords": [
-        "express",
-        "generator-angular-fullstack",
-        "rest",
-        "mongodb",
-        "api"
-    ],
-    "author": "Alex Suslov",
-    "email": "suslov@me.com",
-    "license": "MIT",
-    "devDependencies": {
-        "grunt": "^0.4.5",
-        "grunt-coffeelint": "0.0.10",
-        "grunt-contrib-coffee": "^0.10.1",
-        "grunt-contrib-watch": "^0.6.1",
-        "grunt-mocha-test": "^0.11.0",
-        "load-grunt-tasks": "^0.6.0"
-    },
-    "dependencies": {
-        "mongoose": "^3.8.14"
-    }
+  "name": "wc-query",
+  "version": "0.0.14",
+  "description": "convert req.query to mongo find options",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --compilers coffee:coffee-script/register"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alexsuslov/wcQuery.git"
+  },
+  "keywords": [
+    "express",
+    "generator-angular-fullstack",
+    "rest",
+    "mongodb",
+    "api"
+  ],
+  "author": "Alex Suslov",
+  "email": "suslov@me.com",
+  "license": "MIT",
+  "devDependencies": {
+    "coffee-script": "^1.9.3",
+    "grunt": "^0.4.5",
+    "grunt-coffeelint": "0.0.10",
+    "grunt-contrib-coffee": "^0.10.1",
+    "grunt-contrib-watch": "^0.6.1",
+    "grunt-mocha-test": "^0.11.0",
+    "load-grunt-tasks": "^0.6.0"
+  },
+  "dependencies": {
+    "mongoose": "^3.8.14"
+  }
 }

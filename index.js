@@ -1,3 +1,174 @@
+
+/**
+ * Express Query to Mongoose model find
+ */
+'use strict';
+var Query, extend, ret;
+
+extend = function(source, obj) {
+  var name, _results;
+  _results = [];
+  for (name in obj) {
+    _results.push(source[name] = obj[name]);
+  }
+  return _results;
+};
+
+ret = function(name, val) {
+  var r;
+  r = {};
+  r[name] = val;
+  return r;
+};
+
+Query = {
+  words: {
+    order: function(value) {
+      var name;
+      return {
+        sort: (value[0] === '-' ? (name = value.substr(1, value.length), ret(name, -1)) : ret(value, 1))
+      };
+    },
+    limit: function(value) {
+      return ret('limit', parseInt(value));
+    },
+    skip: function(value) {
+      return ret('skip', parseInt(value));
+    }
+  },
+  vents: {
+    escapeRegExp: function(str) {
+      return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+    },
+    '~': function(name, value) {
+      return ret(name, {
+        $regex: this.escapeRegExp(value),
+        $options: 'i'
+      });
+    },
+    '#': function(name, value) {
+      return ret(name, {
+        $nin: value.split('|')
+      });
+    },
+    '@': function(name, value) {
+      return ret(name, {
+        $in: value.split('|')
+      });
+    },
+    '[': function(name, value) {
+      return ret(name, {
+        $lte: value
+      });
+    },
+    '<': function(name, value) {
+      return ret(name, {
+        $lt: value
+      });
+    },
+    ']': function(name, value) {
+      return ret(name, {
+        $gte: value
+      });
+    },
+    '>': function(name, value) {
+      return ret(name, {
+        $gt: value
+      });
+    },
+    '!': function(name, value) {
+      return ret(name, {
+        $ne: value
+      });
+    },
+    '+': function(name, value) {
+      return ret(name, {
+        $exists: true
+      });
+    },
+    '-': function(name, value) {
+      return ret(name, {
+        $exists: false
+      });
+    },
+    "default": function(name, value) {
+      return ret(name, value);
+    }
+  },
+  vent: function(vent, name, value) {
+    if (this.vents[vent]) {
+      return this.vents[vent](name, value);
+    }
+  },
+  on: function(name, fn) {
+    this.vents[name] = fn;
+    return this;
+  },
+  off: function(name) {
+    vents[name] = void 0;
+    return this;
+  },
+  logic: function(name, value) {
+    var arr, d, query, _i, _len;
+    arr = value.split(',');
+    query = [];
+    for (_i = 0, _len = arr.length; _i < _len; _i++) {
+      value = arr[_i];
+      d = value.split('=');
+      query.push(this.parse(ret([d[0]], d[1])));
+    }
+    return ret('$' + name, query);
+  },
+  main: function(query) {
+    var conditions, name, options, _i, _len, _ref;
+    this.query = query;
+    conditions = {};
+    options = {};
+    if (this.query) {
+      _ref = ['or', 'and'];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        name = _ref[_i];
+        if (this.query[name]) {
+          extend(conditions, this.logic(name, this.query[name]));
+        }
+        delete this.query[name];
+      }
+      for (name in this.query) {
+        if (this.words[name]) {
+          extend(options, this.words[name](this.query[name]));
+          delete this.query[name];
+        }
+      }
+      extend(conditions, this.parse(this.query));
+    }
+    return {
+      conditions: conditions,
+      options: options
+    };
+  },
+  parse: function(query) {
+    var condition, name, value, vent;
+    this.query = query;
+    condition = {};
+    if (this.query) {
+      for (name in this.query) {
+        value = decodeURI(this.query[name]);
+        vent = value[0];
+        if (this.vents[vent]) {
+          extend(condition, this.vent(vent, name, value.substr(1, value.length)));
+        } else {
+          extend(condition, this.vent('default', name, value));
+        }
+      }
+    }
+    return condition;
+  }
+};
+
+module.exports = function(query) {
+  return Query.main(query);
+};
+
 'use strict';
 var ObjectId, Query, Schema, mongoose;
 
@@ -15,6 +186,32 @@ Express req.query -> Mongoose model find options
  */
 
 Query = {
+  words: {
+    limit: function(self) {
+      return self.options.limit = parseInt(self.query.limit);
+    },
+    skip: function(self) {
+      return self.options.skip = parseInt(self.query.skip);
+    },
+    order: function(self) {
+      var options, query;
+      query = self.query;
+      options = self.options;
+      if (options.sort == null) {
+        options.sort = {};
+      }
+      if (query.order[0] === '-') {
+        options.sort[self_str(query.order)] = -1;
+      } else {
+        options.sort[query.order] = 1;
+      }
+      delete query.order;
+      return self;
+    }
+  },
+  commands: {
+    '~': function(self) {}
+  },
   query: false,
 
   /*
@@ -146,12 +343,12 @@ Query = {
     }
     if (str === '+') {
       return {
-        $exists: true
+        "$exists": true
       };
     }
     if (str === '-') {
       return {
-        $exists: false
+        "$exists": false
       };
     }
     if (str[0] === '~') {
