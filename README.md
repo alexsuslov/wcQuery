@@ -63,7 +63,7 @@ exports.index = (req, res) ->
 
 ### Exists
 
-- url: /api/item?name=+
+- url: /api/item?name=%2B
     + name: $exists: true
 
 - url: /api/item?name=-
