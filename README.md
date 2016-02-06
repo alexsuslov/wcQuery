@@ -1,5 +1,7 @@
 # Express req.query -> Mongoose model find options
-## New in 0.0.14
+## New in 0.0.15
+remove deps
+## 0.0.14
 Rewrite from scratch
 
 ### Depricated:
