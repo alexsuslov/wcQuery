@@ -1,6 +1,6 @@
 {
   "name": "wc-query",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "convert req.query to mongo find options",
   "main": "index.js",
   "scripts": {
