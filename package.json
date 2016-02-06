@@ -27,9 +27,10 @@
     "grunt-contrib-coffee": "^0.10.1",
     "grunt-contrib-watch": "^0.6.1",
     "grunt-mocha-test": "^0.11.0",
-    "load-grunt-tasks": "^0.6.0"
+    "load-grunt-tasks": "^0.6.0",
+    "mongoose": "^3.8.14"
   },
   "dependencies": {
-    "mongoose": "^3.8.14"
+    
   }
 }
